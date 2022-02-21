@@ -1,0 +1,115 @@
+--question 1 distinct trip_id for years 2016-2019
+
+SELECT COUNT(DISTINCT trip_id)
+FROM divvybikes_2016;
+-- 3595333 unique ids
+
+SELECT COUNT(DISTINCT trip_id)
+FROM divvybikes_2017;
+-- 3829003 unique ids
+
+SELECT COUNT(DISTINCT trip_id)
+FROM divvybikes_2018;
+-- 3603082 unique ids
+
+SELECT COUNT(DISTINCT trip_id)
+FROM divvybikes_2019;
+-- 3818004 unique ids
+
+--question 1a
+SELECT COUNT(trip_id)
+FROM divvybikes_2016;
+-- 3595383 total trip_ids for 2016, which differs from unique ids, so there are duplicates
+
+SELECT COUNT(trip_id)
+FROM divvybikes_2017;
+-- 3829014 total trip_ids for 2017, which differs from unique ids, so there are duplicates
+
+--question 1b
+
+SELECT trip_id, COUNT(trip_id)
+FROM divvybikes_2016
+GROUP BY trip_id
+HAVING COUNT(trip_id) >= 3;
+-- none for 2016
+
+SELECT trip_id, COUNT(trip_id)
+FROM divvybikes_2017
+GROUP BY trip_id
+HAVING COUNT(trip_id) >= 3;
+-- none for 2017
+
+SELECT trip_id, COUNT(trip_id)
+FROM divvybikes_2018
+GROUP BY trip_id
+HAVING COUNT(trip_id) >= 3;
+-- none for 2018
+
+SELECT trip_id, COUNT(trip_id)
+FROM divvybikes_2019
+GROUP BY trip_id
+HAVING COUNT(trip_id) >= 3;
+-- none for 2019
+
+--question 2
+
+SELECT AVG(btl_price::money::numeric)::money avg_btl_price
+FROM sales_full
+
+--question 2a
+
+SELECT vendor, COUNT(vendor) no_of_sales, AVG(btl_price::money::numeric)::money avg_btl_price,
+	MIN(btl_price::money::numeric)::money min_btl_price, MAX(btl_price::money::numeric)::money max_btl_price
+FROM sales_full
+GROUP BY 1
+ORDER BY 3 desc
+LIMIT 10;
+
+--question 2b
+SELECT vendor, COUNT(vendor) no_of_sales, AVG(btl_price::money::numeric)::money avg_btl_price,
+	MIN(btl_price::money::numeric)::money min_btl_price, MAX(btl_price::money::numeric)::money max_btl_price
+FROM sales_full
+WHERE liter_size >= 750
+GROUP BY 1
+ORDER BY 3 desc
+LIMIT 10;
+
+--question 3
+
+/* He can't use aggregate functions that combines all lines in a where clause because where filters by each line.
+Putting HAVING under the GROUP BY CLAUSE Filters the groups using an aggregate filter
+*/
+
+--question 4
+
+SELECT COUNT(category_name)
+FROM products
+WHERE category_name ilike '%WHISK%'
+
+-- Only 1606 items from the products table have %WHISK% in the category_name
+
+--question 5
+SELECT proof::numeric
+FROM products
+WHERE proof::numeric < 0 or proof::numeric > 200
+
+-- There are five values of proof being above 200, which is the maximum value alcohol can be
+
+--question 6
+SELECT vendor_name, category_name, count(category_name) no_products
+FROM products
+WHERE vendor_name = 'Diageo Americas' AND bottle_price > 15
+GROUP BY 1,2
+ORDER BY count(category_name) desc
+LIMIT 10;
+
+--question 6a
+SELECT vendor_name, category_name, count(category_name) no_products
+FROM products
+WHERE vendor_name = 'Diageo Americas'
+GROUP BY 1,2, bottle_price
+HAVING bottle_price > 15
+ORDER BY count(category_name) desc
+LIMIT 10;
+
+
